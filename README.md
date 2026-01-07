@@ -2,12 +2,8 @@
 
 The **Future Value Predictor** is a modern web application designed to help users understand how inflation impacts the purchasing power of their money over time. It features a clean **Glassmorphism** interface that ensures readability while maintaining a visually appealing aesthetic.
 
----
-
 ## 🚀 Live Demo
 **Test the application here:** [**https://milannba23.github.io/Future-Value-Predictor/**](https://milannba23.github.io/Future-Value-Predictor/)
-
----
 
 ## ✨ Features
 
