@@ -1,0 +1,167 @@
+1. Korak: Kako JS "vidi" tvoj HTML?
+-----------------------------------
+
+Da bi JavaScript mogao bilo šta da izračuna, on prvo mora da "pronađe" elemente na stranici. To radimo pomoću ID-eva koje smo postavili u HTML-u.
+
+HTML: 
+
+	<input type="number" id="money" placeholder="Amount">
+
+Javascript:
+
+	let moneyInput = document.getElementById('money');
+
+  document: To je cela tvoja web stranica.
+
+  getElementById('money'): Ovo je kao da kažeš: "Idi na stranicu i nađi mi                            kutiju na kojoj piše ID 'money'".
+
+  let moneyInput: To je tvoja promenljiva (kontejner) u koju si privremeno                   "uhvatio" taj HTML element.
+
+2. Korak: Uzimanje vrednosti (Value)
+------------------------------------
+
+Sada kada smo "uhvatili" element, on nam ne znači ništa ako ne znamo koji je broj korisnik ukucao.
+
+	let moneyValue = moneyInput.value;
+
+  .value: Ovo izvlači ono što piše unutar polja (npr. "1000").
+
+  Problem: Sve što izvučeš iz input polja, JS vidi kao tekst (String), čak i            ako je broj. Sa tekstom ne možemo da množimo.
+
+Zato koristimo funkciju parseFloat():
+
+
+	let money = parseFloat(moneyInput.value);
+
+   parseFloat: Pretvara tekst "1000" u pravi broj 1000 sa kojim matematika                može da radi.
+
+
+3. Korak: Logika dugmeta (onclick)
+----------------------------------
+
+U HTML-u smo na dugme stavili: <button onclick="inflationCalculator()">
+
+Ovo je "okidač" (Event Trigger).
+
+   Kada korisnik klikne, on kaže JavaScript-u: "Hej, izvrši funkciju koja se    zove inflationCalculator".
+
+   Sva ona logika (uzimanje brojeva, matematika, ispis) mora biti spakovana    unutar te funkcije.
+
+4. Korak: Kako funkcioniše matematika?
+--------------------------------------
+
+Kada dobijemo sve brojeve, koristimo formulu. Najzanimljiviji deo ovde je stepenovanje (godine).
+
+U JavaScript-u to pišemo ovako: Math.pow(osnova, eksponent) Primer: Math.pow(1.05, 10) znači "1.05 na deseti stepen".
+
+5. Korak: Vraćanje rezultata u DOM
+----------------------------------
+
+Na kraju imamo prazan div: <div id="result"></div>. JS treba da "upiše" rečenicu u njega.
+	
+
+	document.getElementById('result').innerHTML = "Tvoj rezultat je...";
+
+  .innerHTML: Ovo je kao da uzmeš olovku i upišeš tekst direktno između tagova <div> i </div>.
+
+Ako u HTML-u imaš polje za broj godina koje izgleda ovako: 
+
+	<input type="number" id="godine">
+
+Kako bi u JavaScript-u napisao liniju koda koja dohvati to polje i odmah pretvori njegovu vrednost u broj? (Probaj da spojiš document.getElementById i parseFloat).
+
+	let years = document.getElementById('years');
+	let yearsValue = parseInt(years.value);
+
+Logika za Select Menu (Padajući meni)
+-------------------------------------
+
+U HTML-u tvoj kod izgleda ovako:
+
+HTML
+
+<select id="currency">
+    <option value="€">EUR (€) - Euro</option>
+    <option value="$">USD ($) - US Dollar</option>
+    ...
+</select>
+
+U JavaScript-u, da bismo izvukli samo simbol (onaj koji piše u value=""), idemo u dva koraka:
+
+Dohvatamo ceo "select" element:
+
+
+	let currencySelector = document.getElementById('currency');
+
+Izvlačimo vrednost (value) trenutno izabrane opcije:
+
+	let currencySymbol = currencySelector.value;
+
+Šta se dešava: JS gleda koji je red plav (selektovan) u meniju i uzima ono što piše u njegovom value atributu. Ako si izabrao "Euro", currencySymbol će postati "€".
+
+Zašto je ovo važno za DOM manipulaciju?
+
+Sada kada imaš sve delove slagalice (money, years, inflationRate i currencySymbol), možemo da sastavimo finalnu rečenicu.
+
+Učiš manipulaciju DOM-om, pa je ovo ključna linija:
+
+
+	resultDiv.innerHTML = `To maintain the same purchasing power as 	today's ${money}${currencySymbol}...`;
+
+
+Evo tvog koda organizovanog onako kako se piše u realnim projektima. Primetićeš da smo dodali i inflationRate koji ti je nedostajao:
+
+JavaScript
+
+function inflationCalculator() {
+    // 1. DOHVATANJE ELEMENATA I VREDNOSTI
+    // Ovo se dešava TEK KADA korisnik klikne na dugme
+    let moneyInput = document.getElementById('money');
+    let moneyValue = parseFloat(moneyInput.value);
+
+    let yearsInput = document.getElementById('years');
+    let yearsValue = parseInt(yearsInput.value);
+
+    let inflationInput = document.getElementById('inflationRate');
+    let inflationValue = parseFloat(inflationInput.value);
+
+    let currencySelector = document.getElementById('currency');
+    let currencyValue = currencySelector.value;
+
+    // 2. MATEMATIKA (Sada kad imamo brojeve)
+    // Formula: money * (1 + inflation/100) na stepen godina
+    let finalValue = moneyValue * (Math.pow((1 + (inflationValue / 100)), yearsValue));
+    finalValue = finalValue.toFixed(2); // Zaokružujemo na 2 decimale
+
+    // 3. ISPIS REZULTATA U DOM
+    let resultOutput = document.getElementById('result');
+    
+    // Koristimo Template Literals koje smo pominjali
+    resultOutput.innerHTML = `To maintain the same purchasing power as today's <b>${moneyValue}${currencyValue}</b>, 
+    you will need <b>${finalValue}${currencyValue}</b> in <b>${yearsValue} years</b>.`;
+}
+
+Zašto je ovo "pravilnije"?
+
+  Funkcija inflationCalculator(): Bez nje, JS bi pokušao da pročita   vrednosti čim se stranica učita (kada su polja još prazna), što bi   rezultiralo greškom NaN (Not a Number). Ovako, JS čeka tvoj klik.
+
+  .toFixed(2): Ovo je bitno jer matematika često izbaci mnogo decimala (npr.   125.43333333), a u finansijama želimo samo dve.
+
+Šta se ovde dešava (DOM logika):
+--------------------------------
+
+ 1.Korisnik klikne na dugme.
+
+ 2.Browser vidi onclick i traži funkciju pod nazivom inflationCalculator() u    tvom script.js fajlu.
+
+ 3.Funkcija se pokreće, "hvata" brojeve koje je korisnik uneo u tom    trenutku, računa ih i ispisuje rezultat.
+
+
+Korak,   Akcija u kodu,   		     Objašnjenje
+
+1.       Hvatanje,document.getElementById,   Pronalazimo element na stranici.
+2.       Čitanje,.value,                     Uzimamo podatak koji je korisnik uneo.
+3.       Konverzija,parseFloat / parseInt,   Pretvaramo tekst u brojeve za matematiku.
+4.       Obrada,Math.pow i formule,          Izračunavamo novu vrednost.
+5.       Upisivanje,.innerHTML,              Menjamo sadržaj stranice i prikazujemo rezultat.
+
